@@ -1,0 +1,43 @@
+{
+  "name": "adonis-drive-azure-storage",
+  "version": "4.1.0",
+  "description": "Azure storage driver for AdonisJS drive",
+  "main": "index.js",
+  "scripts": {
+    "lint": "standard",
+    "pretest": "npm run lint",
+    "test": "japa"
+  },
+  "private": true,
+  "keywords": [
+    "adonisjs",
+    "adonis-framework",
+    "azure",
+    "blob",
+    "storage",
+    "driver",
+    "drive"
+  ],
+  "author": "Alexander Wennerstrøm",
+  "license": "MIT",
+  "homepage": "https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage"
+  },
+  "bugs": {
+    "url": "https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/issues"
+  },
+  "devDependencies": {
+    "@adonisjs/sink": "^1.0.13",
+    "japa": "^1.0.5",
+    "japa-cli": "^1.0.1",
+    "standard": "^10.0.3"
+  },
+  "dependencies": {
+    "@adonisjs/fold": "^4.0.9",
+    "@azure/identity": "^1.0.2",
+    "@azure/storage-blob": "^12.0.2",
+    "resetable": "^1.0.3"
+  }
+}
