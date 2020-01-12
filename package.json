@@ -1,6 +1,6 @@
 {
   "name": "adonis-drive-azure-storage",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "Azure storage driver for AdonisJS drive",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,6 @@
     "pretest": "npm run lint",
     "test": "japa"
   },
-  "private": true,
   "keywords": [
     "adonisjs",
     "adonis-framework",

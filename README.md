@@ -82,7 +82,7 @@ const stream = await Drive.disk('azure').getStream('unicorn.jpg')
 
 #### put(relativePath, Buffer)
 ```javascript
-await Drive.disk('azure').put('unicorn.jpg', Buffer.from('Hello world!))
+await Drive.disk('azure').put('unicorn.jpg', Buffer.from('Hello world!'))
 ```
 
 #### putStream(relativePath, Readable)
