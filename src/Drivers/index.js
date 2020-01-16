@@ -47,10 +47,8 @@ class AzureStorage {
   getBlockBlobClient (relativePath) {
     const container = this._container.pull()
 
-    const fileName = path.basename(relativePath)
-
     const containerClient = this.AzureClient.getContainerClient(container)
-    return containerClient.getBlockBlobClient(fileName)
+    return containerClient.getBlockBlobClient(relativePath)
   }
 
   container (container) {
