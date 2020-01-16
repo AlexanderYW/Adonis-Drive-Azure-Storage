@@ -9,7 +9,6 @@ const {
   BlobSASPermissions
 } = require('@azure/storage-blob')
 const Resetable = require('resetable')
-const path = require('path')
 
 class AzureStorage {
   constructor (config) {
