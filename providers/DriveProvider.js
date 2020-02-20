@@ -1,6 +1,6 @@
 'use strict'
 
-const { ServiceProvider } = require.main.require('@adonisjs/fold')
+const { ServiceProvider } = require('@adonisjs/fold')
 const AzureStorage = require('../src/Drivers')
 
 class DriverProvider extends ServiceProvider {
