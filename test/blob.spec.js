@@ -21,8 +21,16 @@ function bodyToString (response, length) {
   })
 }
 
-test.group('Blob storage testing', () => {
-  test('Create hello.txt file', async (assert) => {
+test.group('Blob storage testing', (group) => {
+  group.before(async () => {
+    const client = new AzureClient(config)
+
+    if (!await client.existsContainer(config.container)) {
+      await client.createContainer(config.container)
+    }
+  })
+
+  group.test('Create hello.txt file', async (assert) => {
     const client = new AzureClient(config)
 
     await client.put('hello.txt', Buffer.from('Hello world!'))
@@ -30,7 +38,7 @@ test.group('Blob storage testing', () => {
     assert.equal(await client.exists('hello.txt'), true)
   })
 
-  test('Create hello.txt file in folder', async (assert) => {
+  group.test('Create hello.txt file in folder', async (assert) => {
     const client = new AzureClient(config)
 
     await client.put('folder/hello.txt', Buffer.from('Hello world!'))
@@ -38,7 +46,7 @@ test.group('Blob storage testing', () => {
     assert.equal(await client.exists('hello.txt'), true)
   })
 
-  test('Create hello.txt file using Stream', async (assert) => {
+  group.test('Create hello.txt file using Stream', async (assert) => {
     const client = new AzureClient(config)
     const { Readable } = require('stream')
     const buffer = Buffer.from('Hello world!')
@@ -52,25 +60,25 @@ test.group('Blob storage testing', () => {
     assert.equal(await client.exists('hello-stream.txt'), true)
   })
 
-  test('Check if file exists', async (assert) => {
+  group.test('Check if file exists', async (assert) => {
     const client = new AzureClient(config)
 
     assert.equal(await client.exists('hello.txt'), true)
   })
 
-  test('Get hello.txt file', async (assert) => {
+  group.test('Get hello.txt file', async (assert) => {
     const client = new AzureClient(config)
 
     assert.equal(await client.get('hello.txt'), 'Hello world!')
   })
 
-  test('Get hello.txt file as stream', async (assert) => {
+  group.test('Get hello.txt file as stream', async (assert) => {
     const client = new AzureClient(config)
 
     assert.equal(await bodyToString(await client.getStream('hello.txt')), 'Hello world!')
   })
 
-  test('Move hello.txt file', async (assert) => {
+  group.test('Move hello.txt file', async (assert) => {
     const client = new AzureClient(config)
 
     await client.move('hello.txt', 'hello-moved.txt')
@@ -78,7 +86,7 @@ test.group('Blob storage testing', () => {
     assert.equal(await client.exists('hello-moved.txt'), true)
   })
 
-  test('Copy hello.txt file', async (assert) => {
+  group.test('Copy hello.txt file', async (assert) => {
     const client = new AzureClient({
       driver: 'azure',
       container: 'adonis-driver-test',
@@ -90,7 +98,7 @@ test.group('Blob storage testing', () => {
     assert.equal(await client.exists('hello.txt'), true)
   })
 
-  test('Delete all created files (Clean up)', async (assert) => {
+  group.test('Delete all created files (Clean up)', async (assert) => {
     const client = new AzureClient(config)
 
     await client.delete('hello.txt')
