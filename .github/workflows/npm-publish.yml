@@ -24,6 +24,6 @@ jobs:
         with:
           node-version: 12
       - run: npm install -g azurite
-      - run: azurite-blob -l ../azurite/workspace
+      - run: azurite-blob
       - run: npm ci
       - run: npm test
