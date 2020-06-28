@@ -81,17 +81,14 @@ test.group('Blob storage testing', (group) => {
   group.test('Move hello.txt file', async (assert) => {
     const client = new AzureClient(config)
 
+    await client.put('hello.txt', Buffer.from('Hello world!'))
     await client.move('hello.txt', 'hello-moved.txt')
 
     assert.equal(await client.exists('hello-moved.txt'), true)
   })
 
   group.test('Copy hello.txt file', async (assert) => {
-    const client = new AzureClient({
-      driver: 'azure',
-      container: 'adonis-driver-test',
-      connection_string: 'UseDevelopmentStorage=true'
-    })
+    const client = new AzureClient(config)
 
     await client.copy('hello-moved.txt', 'hello.txt')
 
