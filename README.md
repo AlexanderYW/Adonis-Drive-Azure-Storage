@@ -1,5 +1,7 @@
 # Adonis Drive - Azure Storage (blob)
 
+![Node.js Package](https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/workflows/Node.js%20Package/badge.svg)
+
 ## Requirements 📦
 Adonis Drive
 ```sh
