@@ -12,8 +12,7 @@ const config = {
 function bodyToString (response, length) {
   return new Promise((resolve, reject) => {
     response.readableStreamBody.on('readable', () => {
-      let chunk
-      chunk = response.readableStreamBody.read(length)
+      const chunk = response.readableStreamBody.read(length)
       if (chunk) {
         resolve(chunk.toString())
       }
