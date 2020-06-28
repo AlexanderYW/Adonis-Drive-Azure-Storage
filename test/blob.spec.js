@@ -81,7 +81,6 @@ test.group('Blob storage testing', (group) => {
   group.test('Move hello.txt file', async (assert) => {
     const client = new AzureClient(config)
 
-    await client.put('hello.txt', Buffer.from('Hello world!'))
     await client.move('hello.txt', 'hello-moved.txt')
 
     assert.equal(await client.exists('hello-moved.txt'), true)
@@ -109,5 +108,11 @@ test.group('Blob storage testing', (group) => {
       await client.exists('folder/hello.txt')
 
     assert.equal(doesExists, false)
+  })
+
+  group.after(async () => {
+    const client = new AzureClient(config)
+
+    await client.deleteContainer(config.container)
   })
 })
