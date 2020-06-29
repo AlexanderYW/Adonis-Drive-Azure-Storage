@@ -20,10 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-      - uses: actions/download-artifact@v2
+      - uses: actions/upload-artifact@v2
         with:
           name: adonis-drive-azure-storage
+      - uses: actions/setup-node@v1
+        with:
           node-version: 12
       - run: npm install -g azurite
       - run: azurite-blob --silent --debug debug.log &
