@@ -1,6 +1,10 @@
 # Adonis Drive - Azure Storage (blob)
 
-![Node.js Package](https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/workflows/Node.js%20Package/badge.svg)
+[![image](https://img.shields.io/npm/dm/adonis-drive-azure-storage.svg)](https://www.npmjs.com/package/adonis-drive-azure-storage)
+[![image](https://img.shields.io/npm/v/adonis-drive-azure-storage.svg)](https://www.npmjs.com/package/adonis-drive-azure-storage)
+[![image](https://img.shields.io/npm/l/adonis-drive-azure-storage.svg)](https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/blob/master/LICENSE)
+[![CodeQL](https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/workflows/CodeQL/badge.svg)](https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/actions?query=workflow%3ACodeQL)
+[![Node.js Package](https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/workflows/Node.js%20Package/badge.svg)](https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/actions?query=workflow%3A%22Node.js+Package%22)
 
 ## Requirements 📦
 Adonis Drive
