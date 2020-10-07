@@ -79,21 +79,21 @@ test.group('Blob storage testing', (group) => {
   })
 
   // Disabled until next version of Azurite is released
-  /*group.test('Move hello.txt file', async (assert) => {
+  /* group.test('Move hello.txt file', async (assert) => {
     const client = new AzureClient(config)
 
     await client.move('hello.txt', 'hello-moved.txt')
 
     assert.equal(await client.exists('hello-moved.txt'), true)
-  })*/
+  }) */
 
-  /*group.test('Copy hello.txt file', async (assert) => {
+  /* group.test('Copy hello.txt file', async (assert) => {
     const client = new AzureClient(config)
 
     await client.copy('hello-moved.txt', 'hello.txt')
 
     assert.equal(await client.exists('hello.txt'), true)
-  })*/
+  }) */
 
   group.test('Delete all created files (Clean up)', async (assert) => {
     const client = new AzureClient(config)
