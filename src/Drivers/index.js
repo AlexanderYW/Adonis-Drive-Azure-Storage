@@ -55,6 +55,34 @@ class AzureStorage {
     return this
   }
 
+  existsContainer (container) {
+    const containerClient = this.AzureClient.getContainerClient(container)
+    return new Promise((resolve, reject) => {
+      containerClient.exists().then(container => {
+        resolve(container)
+      })
+    })
+  }
+
+  createContainer (container) {
+    const containerClient = this.AzureClient.getContainerClient(container)
+    return new Promise((resolve, reject) => {
+      containerClient.create().then(container => {
+        this._container.set(container)
+        resolve(container)
+      })
+    })
+  }
+
+  deleteContainer (container) {
+    const containerClient = this.AzureClient.getContainerClient(container)
+    return new Promise((resolve, reject) => {
+      containerClient.delete().then(container => {
+        resolve(container)
+      })
+    })
+  }
+
   exists (relativePath) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
