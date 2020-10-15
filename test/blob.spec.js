@@ -99,12 +99,12 @@ test.group('Blob storage testing', (group) => {
     const client = new AzureClient(config)
 
     await client.delete('hello.txt')
-    // await client.delete('hello-moved.txt')
+    await client.delete('hello-moved.txt')
     await client.delete('hello-stream.txt')
     await client.delete('folder/hello.txt')
 
     const doesExists = await client.exists('hello.txt') &&
-      // await client.exists('hello-moved.txt') &&
+      await client.exists('hello-moved.txt') &&
       await client.exists('hello-stream.txt') &&
       await client.exists('folder/hello.txt')
 
