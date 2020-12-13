@@ -217,7 +217,7 @@ class AzureStorage {
   getUrl (relativePath) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
-    return blockBlobClient.url
+    return unescape(blockBlobClient.url)
   }
 }
 
