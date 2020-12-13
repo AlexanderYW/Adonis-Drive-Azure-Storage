@@ -8,6 +8,7 @@ const config = {
   container: 'adonis-driver-test',
   connection_string: 'UseDevelopmentStorage=true'
 }
+const containerString = `http://127.0.0.1:10000/devstoreaccount1/${config.container}`
 
 function bodyToString (response, length) {
   return new Promise((resolve, reject) => {
@@ -41,9 +42,12 @@ test.group('Blob storage testing', (group) => {
   group.test('Create hello.txt file in folder', async (assert) => {
     const client = new AzureClient(config)
 
-    await client.put('folder/hello.txt', Buffer.from('Hello world!'))
+    const filePath = 'folder/hello.txt'
 
-    assert.equal(await client.exists('folder/hello.txt'), true)
+    await client.put(filePath, Buffer.from('Hello world!'))
+
+    assert.equal(await client.exists(filePath), true)
+    assert.equal(await client.getUrl(filePath), `${containerString}/${filePath}`) // Checking url is unescaped
   })
 
   group.test('Create hello.txt file using Stream', async (assert) => {
