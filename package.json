@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@azure/identity": "^1.2.0",
-    "@azure/storage-blob": "^12.2.1",
+    "@azure/storage-blob": "^12.3.0",
     "resetable": "^1.0.3"
   }
 }
