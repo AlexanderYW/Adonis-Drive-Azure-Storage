@@ -36,7 +36,7 @@
     "@adonisjs/fold": "^4.0.9"
   },
   "dependencies": {
-    "@azure/identity": "^1.2.4",
+    "@azure/identity": "^1.2.5",
     "@azure/storage-blob": "^12.5.0",
     "resetable": "^1.0.3"
   }
