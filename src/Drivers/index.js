@@ -93,12 +93,12 @@ class AzureStorage {
     })
   }
 
-  put (relativePath, content) {
+  put (relativePath, content, options = {}) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
     return new Promise((resolve, reject) => {
       try {
-        blockBlobClient.upload(content, content.length).then(response => {
+        blockBlobClient.upload(content, content.length, options).then(response => {
           resolve(response)
         })
       } catch (err) {
