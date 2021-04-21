@@ -55,39 +55,39 @@ class AzureStorage {
     return this
   }
 
-  existsContainer (container) {
+  existsContainer (container, options = {}) {
     const containerClient = this.AzureClient.getContainerClient(container)
     return new Promise((resolve, reject) => {
-      containerClient.exists().then(container => {
+      containerClient.exists(options).then(container => {
         resolve(container)
       })
     })
   }
 
-  createContainer (container) {
+  createContainer (container, options = {}) {
     const containerClient = this.AzureClient.getContainerClient(container)
     return new Promise((resolve, reject) => {
-      containerClient.create().then(container => {
+      containerClient.create(options).then(container => {
         this._container.set(container)
         resolve(container)
       })
     })
   }
 
-  deleteContainer (container) {
+  deleteContainer (container, options = {}) {
     const containerClient = this.AzureClient.getContainerClient(container)
     return new Promise((resolve, reject) => {
-      containerClient.delete().then(container => {
+      containerClient.delete(options).then(container => {
         resolve(container)
       })
     })
   }
 
-  exists (relativePath) {
+  exists (relativePath, options = {}) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
     return new Promise((resolve, reject) => {
-      blockBlobClient.exists().then(exists => {
+      blockBlobClient.exists(options).then(exists => {
         resolve(exists)
       })
     })
@@ -107,12 +107,12 @@ class AzureStorage {
     })
   }
 
-  putStream (relativePath, content) {
+  putStream (relativePath, content, options = {}) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
     return new Promise((resolve, reject) => {
       try {
-        blockBlobClient.uploadStream(content, content.length).then(response => {
+        blockBlobClient.uploadStream(content, content.length, options).then(response => {
           resolve(response)
         })
       } catch (err) {
@@ -121,12 +121,12 @@ class AzureStorage {
     })
   }
 
-  delete (relativePath) {
+  delete (relativePath, options = {}) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
     return new Promise((resolve, reject) => {
       try {
-        blockBlobClient.delete().then(exists => {
+        blockBlobClient.delete(options).then(exists => {
           resolve(exists)
         })
       } catch (err) {
@@ -135,12 +135,12 @@ class AzureStorage {
     })
   }
 
-  get (relativePath) {
+  get (relativePath, options = {}) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
     return new Promise((resolve, reject) => {
       try {
-        blockBlobClient.downloadToBuffer(0).then(file => {
+        blockBlobClient.downloadToBuffer(0, 0, options).then(file => {
           resolve(file)
         })
       } catch (err) {
@@ -149,12 +149,12 @@ class AzureStorage {
     })
   }
 
-  getStream (relativePath) {
+  getStream (relativePath, options = {}) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
     return new Promise((resolve, reject) => {
       try {
-        blockBlobClient.download(0).then(file => {
+        blockBlobClient.download(0, 0, options).then(file => {
           resolve(file)
         })
       } catch (err) {
