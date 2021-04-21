@@ -83,6 +83,22 @@ class AzureStorage {
     })
   }
 
+  /**
+   * List all files within vitual folder if specified
+   * If nothing is specified, root files within container will be listed
+   * Disclaimer: Doesn't list virtual folders
+   */
+  async list (prefix = '', options = {}) {
+    if (prefix !== null && prefix !== undefined && prefix !== '') {
+      options.prefix = prefix
+    }
+
+    const container = this._container.pull()
+    const containerClient = this.AzureClient.getContainerClient(container)
+    const listBlobsResponse = await containerClient.listBlobHierarchySegment('/', '/', options)
+    return listBlobsResponse.segment.blobItems
+  }
+
   exists (relativePath, options = {}) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
