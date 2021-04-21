@@ -29,7 +29,7 @@ class AzureStorage {
         credential = new StorageSharedKeyCredential(config.name, config.key)
       }
 
-      var url = `https://${config.name}.blob.core.windows.net`
+      let url = `https://${config.name}.blob.core.windows.net`
 
       if (typeof config.local_address !== 'undefined') {
         url = config.local_address
