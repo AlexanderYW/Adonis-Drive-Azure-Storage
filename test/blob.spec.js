@@ -31,6 +31,12 @@ test.group('Blob storage testing', (group) => {
     }
   })
 
+  group.test('List files in empty root', async (assert) => {
+    const client = new AzureClient(config)
+
+    assert.isAtLeast((await client.list()).length, 0)
+  })
+
   group.test('Create hello.txt file', async (assert) => {
     const client = new AzureClient(config)
 
@@ -97,6 +103,28 @@ test.group('Blob storage testing', (group) => {
     await client.copy('hello-moved.txt', 'hello.txt')
 
     assert.equal(await client.exists('hello.txt'), true)
+  })
+
+  group.test('List files in root', async (assert) => {
+    const client = new AzureClient(config)
+
+    assert.isAtLeast((await client.list()).length, 1)
+  })
+
+  group.test('List files in folder', async (assert) => {
+    const client = new AzureClient(config)
+
+    const folderPath = 'folder/'
+
+    assert.isAtLeast((await client.list(folderPath)).length, 1)
+  })
+
+  group.test('List files in non-existing folder', async (assert) => {
+    const client = new AzureClient(config)
+
+    const folderPath = 'fake/'
+
+    assert.isAtLeast((await client.list(folderPath)).length, 0)
   })
 
   group.test('Delete all created files (Clean up)', async (assert) => {
