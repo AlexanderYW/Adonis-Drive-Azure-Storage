@@ -1,31 +1,47 @@
 'use strict'
 
-const { DefaultAzureCredential } = require('@azure/identity')
-const {
+import { DefaultAzureCredential } from '@azure/identity'
+import {
   BlobServiceClient,
   newPipeline,
   StorageSharedKeyCredential,
   generateBlobSASQueryParameters,
-  BlobSASPermissions
-} = require('@azure/storage-blob')
-const Resetable = require('resetable')
+  BlobSASPermissions,
+  BlobItem,
+} from '@azure/storage-blob'
 
-class AzureStorage {
-  constructor (config) {
+import Resetable from 'resetable'
+
+export interface Config {
+  connection_string?: string;
+  azure_tenant_id?: string;
+  azure_client_id?: string;
+  azure_client_secret?: string;
+  driver?: string;
+  name?: string;
+  key?: string;
+  local_address?: string;
+  container?: string
+}
+
+export default class AzureStorage {
+  private AzureClient: BlobServiceClient
+  private _container: Resetable
+  constructor (protected config: Config) {
     if (typeof config.connection_string !== 'undefined') {
       // eslint-disable-next-line
-      this.AzureClient = new BlobServiceClient.fromConnectionString(
+      this.AzureClient = BlobServiceClient.fromConnectionString(
         config.connection_string
       )
     } else {
-      let credential = null
+      let credential
       if (
         config.azure_tenant_id &&
         config.azure_client_id &&
         config.azure_client_secret
       ) {
         credential = new DefaultAzureCredential()
-      } else {
+      } else if (config.name && config.key) {
         credential = new StorageSharedKeyCredential(config.name, config.key)
       }
 
@@ -43,43 +59,55 @@ class AzureStorage {
     this._container = new Resetable(config.container)
   }
 
-  getBlockBlobClient (relativePath) {
+  public getBlockBlobClient (relativePath: string) {
     const container = this._container.pull()
 
     const containerClient = this.AzureClient.getContainerClient(container)
     return containerClient.getBlockBlobClient(relativePath)
   }
 
-  container (container) {
+  public container (container: string) {
     this._container.set(container)
     return this
   }
 
-  existsContainer (container, options = {}) {
+  public existsContainer (container: string, options: any = {}) {
     const containerClient = this.AzureClient.getContainerClient(container)
     return new Promise((resolve, reject) => {
-      containerClient.exists(options).then(container => {
-        resolve(container)
-      })
+      try {
+        containerClient.exists(options).then(containerResult => {
+          resolve(containerResult)
+        })
+      } catch (err) {
+        reject(err)
+      }
     })
   }
 
-  createContainer (container, options = {}) {
+  public createContainer (container: string, options: any = {}) {
     const containerClient = this.AzureClient.getContainerClient(container)
     return new Promise((resolve, reject) => {
-      containerClient.create(options).then(container => {
-        this._container.set(container)
-        resolve(container)
-      })
+      try {
+        containerClient.create(options).then(containerResult => {
+          this._container.set(containerResult)
+          resolve(containerResult)
+        })
+      } catch (err) {
+        reject(err)
+      }
     })
   }
 
-  deleteContainer (container, options = {}) {
+  public deleteContainer (container: string, options: any = {}) {
     const containerClient = this.AzureClient.getContainerClient(container)
     return new Promise((resolve, reject) => {
-      containerClient.delete(options).then(container => {
-        resolve(container)
-      })
+      try {
+        containerClient.delete(options).then(containerResult => {
+          resolve(containerResult)
+        })
+      } catch (err) {
+        reject(err)
+      }
     })
   }
 
@@ -88,28 +116,38 @@ class AzureStorage {
    * If nothing is specified, root files within container will be listed
    * Disclaimer: Doesn't list virtual folders
    */
-  async list (prefix = '', options = {}) {
+  public async list (prefix: string = '', options: any = {}) {
     if (prefix !== null && prefix !== undefined && prefix !== '') {
       options.prefix = prefix
     }
 
     const container = this._container.pull()
     const containerClient = this.AzureClient.getContainerClient(container)
-    const listBlobsResponse = await containerClient.listBlobHierarchySegment('/', '/', options)
-    return listBlobsResponse.segment.blobItems
+    // const listBlobsResponse = await containerClient.listBlobsByHierarchy('/', options)
+    const blobs : BlobItem[] = []
+    for await (const item of containerClient.listBlobsByHierarchy('/', options)) {
+      if (item.kind !== 'prefix') {
+        blobs.push(item)
+      }
+    }
+    return blobs
   }
 
-  exists (relativePath, options = {}) {
+  public exists (relativePath: string, options: any = {}) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
     return new Promise((resolve, reject) => {
-      blockBlobClient.exists(options).then(exists => {
-        resolve(exists)
-      })
+      try {
+        blockBlobClient.exists(options).then(exists => {
+          resolve(exists)
+        })
+      } catch (err) {
+        reject(err)
+      }
     })
   }
 
-  put (relativePath, content, options = {}) {
+  public put (relativePath: string, content: any, options: any = {}) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
     return new Promise((resolve, reject) => {
@@ -123,7 +161,7 @@ class AzureStorage {
     })
   }
 
-  putStream (relativePath, content) {
+  public putStream (relativePath: string, content: any) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
     return new Promise((resolve, reject) => {
@@ -137,7 +175,7 @@ class AzureStorage {
     })
   }
 
-  delete (relativePath, options = {}) {
+  public delete (relativePath: string, options: any = {}) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
     return new Promise((resolve, reject) => {
@@ -151,7 +189,7 @@ class AzureStorage {
     })
   }
 
-  get (relativePath, options = {}) {
+  public get (relativePath: string, options: any = {}) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
     return new Promise((resolve, reject) => {
@@ -165,7 +203,7 @@ class AzureStorage {
     })
   }
 
-  getStream (relativePath, options = {}) {
+  public getStream (relativePath: string, options: any = {}) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
     return new Promise((resolve, reject) => {
@@ -179,13 +217,13 @@ class AzureStorage {
     })
   }
 
-  async move (relativeSrcPath, relativeDestPath, options = {}) {
+  public async move (relativeSrcPath: string, relativeDestPath: string, options: any = {}) {
     const srcContainer = this._container.get()
     await this.copy(relativeSrcPath, relativeDestPath, options)
     return this.container(srcContainer).delete(relativeSrcPath)
   }
 
-  async copy (relativeSrcPath, relativeDestPath, options = {}) {
+  public async copy (relativeSrcPath: string, relativeDestPath: string, options: any = {}) {
     const container = this._container.pull()
     options.destContainer = options.destContainer || container
 
@@ -201,7 +239,7 @@ class AzureStorage {
     }
   }
 
-  async generateBlobSASURL (blockBlobClient, options = {}) {
+  public async generateBlobSASURL (blockBlobClient, options: any = {}) {
     options.permissions = options.permissions || 'r'
 
     options.expiry = options.expiry || 3600
@@ -216,7 +254,7 @@ class AzureStorage {
         blobName: blockBlobClient.location, // Required
         permissions: BlobSASPermissions.parse(options.permissions), // Required
         startsOn: options.startsOn,
-        expiresOn: options.expiresOn
+        expiresOn: options.expiresOn,
       },
       blockBlobClient.credential
     )
@@ -224,17 +262,15 @@ class AzureStorage {
     return `${blockBlobClient.url}?${blobSAS.toString()}`
   }
 
-  async getSignedUrl (relativePath, options = {}) {
+  public async getSignedUrl (relativePath: string, options: any = {}) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
     const SASUrl = await this.generateBlobSASURL(blockBlobClient, options)
     return SASUrl
   }
 
-  getUrl (relativePath) {
+  public getUrl (relativePath: string) {
     const blockBlobClient = this.getBlockBlobClient(relativePath)
 
     return unescape(blockBlobClient.url)
   }
 }
-
-module.exports = AzureStorage
