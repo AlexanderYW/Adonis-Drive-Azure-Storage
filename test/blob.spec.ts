@@ -1,18 +1,18 @@
 'use strict'
 
-const test = require('japa')
-const AzureClient = require('../src/Drivers')
+import test from 'japa'
+import AzureClient from '../src/Drivers'
 
 const config = {
   driver: 'azure',
   container: 'adonis-driver-test',
-  connection_string: 'UseDevelopmentStorage=true'
+  connection_string: 'UseDevelopmentStorage=true',
 }
 const containerString = `http://127.0.0.1:10000/devstoreaccount1/${config.container}`
 
-function bodyToString (response, length) {
+function bodyToString (response: any) {
   return new Promise((resolve, reject) => {
-    response.readableStreamBody.on('readable', () => {
+    response.readableStreamBody.on('readable', (length: any) => {
       const chunk = response.readableStreamBody.read(length)
       if (chunk) {
         resolve(chunk.toString())
@@ -31,13 +31,13 @@ test.group('Blob storage testing', (group) => {
     }
   })
 
-  group.test('List files in empty root', async (assert) => {
+  test('List files in empty root', async (assert) => {
     const client = new AzureClient(config)
 
     assert.isAtLeast((await client.list()).length, 0)
   })
 
-  group.test('Create hello.txt file', async (assert) => {
+  test('Create hello.txt file', async (assert) => {
     const client = new AzureClient(config)
 
     await client.put('hello.txt', Buffer.from('Hello world!'))
@@ -45,7 +45,7 @@ test.group('Blob storage testing', (group) => {
     assert.equal(await client.exists('hello.txt'), true)
   })
 
-  group.test('Create hello.txt file in folder', async (assert) => {
+  test('Create hello.txt file in folder', async (assert) => {
     const client = new AzureClient(config)
 
     const filePath = 'folder/hello.txt'
@@ -56,7 +56,7 @@ test.group('Blob storage testing', (group) => {
     assert.equal(await client.getUrl(filePath), `${containerString}/${filePath}`) // Checking url is unescaped
   })
 
-  group.test('Create hello.txt file using Stream', async (assert) => {
+  test('Create hello.txt file using Stream', async (assert) => {
     const client = new AzureClient(config)
     const { Readable } = require('stream')
     const buffer = Buffer.from('Hello world!')
@@ -70,26 +70,26 @@ test.group('Blob storage testing', (group) => {
     assert.equal(await client.exists('hello-stream.txt'), true)
   })
 
-  group.test('Check if file exists', async (assert) => {
+  test('Check if file exists', async (assert) => {
     const client = new AzureClient(config)
 
     assert.equal(await client.exists('hello.txt'), true)
   })
 
-  group.test('Get hello.txt file', async (assert) => {
+  test('Get hello.txt file', async (assert) => {
     const client = new AzureClient(config)
 
     assert.equal(await client.get('hello.txt'), 'Hello world!')
   })
 
-  group.test('Get hello.txt file as stream', async (assert) => {
+  test('Get hello.txt file as stream', async (assert) => {
     const client = new AzureClient(config)
 
     assert.equal(await bodyToString(await client.getStream('hello.txt')), 'Hello world!')
   })
 
   // Disabled until next version of Azurite is released
-  group.test('Move hello.txt file', async (assert) => {
+  test('Move hello.txt file', async (assert) => {
     const client = new AzureClient(config)
 
     await client.move('hello.txt', 'hello-moved.txt')
@@ -97,7 +97,7 @@ test.group('Blob storage testing', (group) => {
     assert.equal(await client.exists('hello-moved.txt'), true)
   })
 
-  group.test('Copy hello.txt file', async (assert) => {
+  test('Copy hello.txt file', async (assert) => {
     const client = new AzureClient(config)
 
     await client.copy('hello-moved.txt', 'hello.txt')
@@ -105,13 +105,13 @@ test.group('Blob storage testing', (group) => {
     assert.equal(await client.exists('hello.txt'), true)
   })
 
-  group.test('List files in root', async (assert) => {
+  test('List files in root', async (assert) => {
     const client = new AzureClient(config)
 
     assert.isAtLeast((await client.list()).length, 1)
   })
 
-  group.test('List files in folder', async (assert) => {
+  test('List files in folder', async (assert) => {
     const client = new AzureClient(config)
 
     const folderPath = 'folder/'
@@ -119,7 +119,7 @@ test.group('Blob storage testing', (group) => {
     assert.isAtLeast((await client.list(folderPath)).length, 1)
   })
 
-  group.test('List files in non-existing folder', async (assert) => {
+  test('List files in non-existing folder', async (assert) => {
     const client = new AzureClient(config)
 
     const folderPath = 'fake/'
@@ -127,7 +127,7 @@ test.group('Blob storage testing', (group) => {
     assert.isAtLeast((await client.list(folderPath)).length, 0)
   })
 
-  group.test('Delete all created files (Clean up)', async (assert) => {
+  test('Delete all created files (Clean up)', async (assert) => {
     const client = new AzureClient(config)
 
     await client.delete('hello.txt')
