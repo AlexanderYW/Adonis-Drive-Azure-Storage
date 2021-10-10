@@ -162,4 +162,15 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
   ): Promise<NodeJS.ReadableStream> {
     return (await this.getBlockBlobClient(location).download(0, 0, options)).readableStreamBody
   }
+
+  /**
+   * A boolean to find if the location path exists or not
+   */
+  public exists(location: string, options: BlobExistsOptions | any = {}): Promise<boolean> {
+    try {
+      return this.getBlockBlobClient(location).exists(options)
+    } catch (error) {
+      throw CannotGetMetaDataException.invoke(location, 'exists', error)
+    }
+  }
 }
