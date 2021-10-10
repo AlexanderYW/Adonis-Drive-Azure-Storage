@@ -1,6 +1,6 @@
 {
   "name": "adonis-drive-azure-storage",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "description": "Azure storage driver for AdonisJS drive",
   "main": "./build/providers/DriveProvider.js",
   "scripts": {
