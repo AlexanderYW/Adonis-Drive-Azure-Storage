@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 12
       - run: npm install -g azurite
-      - run: azurite-blob --silent --debug debug.log &
+      - run: azurite-blob --silent --loose --debug debug.log &
       - run: npm ci
       - run: npm test
 
