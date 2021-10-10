@@ -87,4 +87,79 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
 
     // this._container = new Resetable(this.config.container)
   }
+
+  /**
+   * Transforms the write options to GCS properties. Checkout the
+   * following example in the docs to see the available options
+   *
+   * https://googleapis.dev/nodejs/storage/latest/File.html#createWriteStream
+   */
+  private transformWriteOptions(options?: WriteOptions) {
+    const {
+      visibility,
+      contentType,
+      contentDisposition,
+      contentEncoding,
+      contentLanguage,
+      ...adapterOptions
+    } = Object.assign({ visibility: this.config.visibility }, options)
+
+    adapterOptions.metadata = {}
+
+    if (contentType) {
+      adapterOptions['contentType'] = contentType
+    }
+
+    if (contentDisposition) {
+      adapterOptions.metadata['contentDisposition'] = contentDisposition
+    }
+
+    if (contentEncoding) {
+      adapterOptions.metadata['contentEncoding'] = contentEncoding
+    }
+
+    if (contentLanguage) {
+      adapterOptions.metadata['contentLanguage'] = contentLanguage
+    }
+
+    return adapterOptions
+  }
+
+  /**
+   * Converts ms expression to milliseconds
+   */
+  private msToTimeStamp(ms: string | number) {
+    return new Date(Date.now() + string.toMs(ms)).getTime()
+  }
+
+  public getBlockBlobClient(location: string) {
+    const container = this.config.container
+
+    const containerClient = this.adapter.getContainerClient(container)
+    return containerClient.getBlockBlobClient(location)
+  }
+
+  /**
+   * Returns the file contents as a buffer. The buffer return
+   * value allows you to self choose the encoding when
+   * converting the buffer to a string.
+   */
+  public async get(location: string, options: BlobDownloadToBufferOptions | any = {}): Promise<Buffer> {
+    try {
+      const blockBlobClient = this.getBlockBlobClient(location)
+      return await blockBlobClient.downloadToBuffer(0, 0, options)
+    } catch (error) {
+      throw CannotReadFileException.invoke(location, error)
+    }
+  }
+
+  /**
+   * Returns the file contents as a stream
+   */
+  public async getStream(
+    location: string,
+    options: BlobDownloadOptions | any = {}
+  ): Promise<NodeJS.ReadableStream> {
+    return (await this.getBlockBlobClient(location).download(0, 0, options)).readableStreamBody
+  }
 }
