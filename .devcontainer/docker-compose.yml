@@ -25,6 +25,7 @@ services:
     restart: unless-stopped
     volumes:
       - azurite-data:/data/storage
+    command: "azurite-blob --loose --blobHost 0.0.0.0"
 
 volumes:
   azurite-data:
