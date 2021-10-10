@@ -32,6 +32,9 @@ import {
   BlobDownloadOptions,
   BlobDownloadToBufferOptions,
   BlobExistsOptions,
+  BlobSASPermissions,
+  generateBlobSASQueryParameters,
+  BlobSASSignatureValues,
 } from '@azure/storage-blob'
 
 /*
@@ -139,6 +142,26 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
     return containerClient.getBlockBlobClient(location)
   }
 
+  public async generateBlobSASURL(blockBlobClient, options: BlobSASSignatureValues): Promise<string> {
+    options.permissions = BlobSASPermissions.parse(options.permissions as unknown as string || 'r')
+
+    options.expiresOn = options.expiresOn || new Date(options.startsOn.valueOf() + 3600 * 1000)
+    options.startsOn = options.startsOn || new Date()
+
+    const blobSAS = await generateBlobSASQueryParameters(
+      {
+        containerName: blockBlobClient.containerName, // Required
+        blobName: blockBlobClient.location, // Required
+        permissions: options.permissions, // Required
+        startsOn: options.startsOn,
+        expiresOn: options.expiresOn,
+      },
+      blockBlobClient.credential
+    )
+
+    return `${blockBlobClient.url}?${blobSAS.toString()}`
+  }
+
   /**
    * Returns the file contents as a buffer. The buffer return
    * value allows you to self choose the encoding when
@@ -171,6 +194,19 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
       return this.getBlockBlobClient(location).exists(options)
     } catch (error) {
       throw CannotGetMetaDataException.invoke(location, 'exists', error)
+    }
+  }
+
+  /**
+   * Returns the signed url for a given path
+   */
+  public async getSignedUrl(location: string, options: BlobSASSignatureValues): Promise<string> {
+    try {
+      const blockBlobClient = this.getBlockBlobClient(location)
+      const SASUrl = await this.generateBlobSASURL(blockBlobClient, options)
+      return SASUrl
+    } catch (error) {
+      throw CannotGetMetaDataException.invoke(location, 'signedUrl', error)
     }
   }
 }
