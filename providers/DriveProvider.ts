@@ -1,25 +1,31 @@
 'use strict'
 
-/*
- * adonis-drive-azure-storage
- *
- * (c) Harminder Virk <virk@adonisjs.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+// const { ServiceProvider } = require('@adonisjs/fold')
+// const AzureStorage = require('../src/Drivers')
+// import { ApplicationContract } from '@ioc:Adonis/Core/Application'
+import { ServiceProvider } from '@adonisjs/fold'
+import AzureStorage from '../src/Drivers'
 
-import { ApplicationContract } from '@ioc:Adonis/Core/Application'
+/* class DriverProvider extends ServiceProvider {
+  register () {
+    this.app.extend('Adonis/Addons/Drive', 'azure', () => {
+      return AzureStorage
+    })
+  }
+} */
 
-export default class AzureStorageProvider {
-  constructor(protected app: ApplicationContract) {}
+// export default class DriverProvider extends ServiceProvider {
+export default class DriverProvider {
+  public static needsApplication = true
+  constructor (protected app: ServiceProvider) {}
 
-  public boot() {
-    this.app.container.withBindings(['Adonis/Core/Drive'], (Drive) => {
-      Drive.extend('AzureStorage', (_, __, config) => {
-        const { AzureStorageDriver } = require('../src/Drivers')
-        return new AzureStorageDriver(config)
-      })
+  public register (): void {
+    /* this.app.container.singleton('Adonis/Addons/LucidFilter', () => ({
+      filterable,
+      BaseModelFilter,
+    })) */
+    this.app.extend('Adonis/Addons/Drive', 'azure', () => {
+      return AzureStorage
     })
   }
 }
