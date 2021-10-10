@@ -183,7 +183,7 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
     location: string,
     options: BlobDownloadOptions | any = {}
   ): Promise<NodeJS.ReadableStream> {
-    return (await this.getBlockBlobClient(location).download(0, 0, options)).readableStreamBody
+    return (await this.getBlockBlobClient(location).download(0, 0, options)).readableStreamBody as NodeJS.ReadableStream
   }
 
   /**
@@ -208,5 +208,12 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
     } catch (error) {
       throw CannotGetMetaDataException.invoke(location, 'signedUrl', error)
     }
+  }
+
+  /**
+   * Returns URL to a given path
+   */
+  public async getUrl(location: string): Promise<string> {
+    return unescape(this.getBlockBlobClient(location).url)
   }
 }
