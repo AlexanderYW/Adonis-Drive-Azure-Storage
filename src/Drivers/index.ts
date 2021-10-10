@@ -21,7 +21,7 @@ import {
 } from '@ioc:Adonis/Core/Drive'
 
 import { promisify } from 'util'
-import { pipeline, Readable } from 'stream'
+import { PassThrough, pipeline } from 'stream'
 import { string } from '@poppinss/utils/build/helpers'
 
 import { DefaultAzureCredential } from '@azure/identity'
@@ -35,6 +35,8 @@ import {
   BlobSASPermissions,
   generateBlobSASQueryParameters,
   BlobSASSignatureValues,
+  BlockBlobUploadOptions,
+  BlockBlobUploadStreamOptions,
 } from '@azure/storage-blob'
 
 /*
@@ -215,5 +217,35 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
    */
   public async getUrl(location: string): Promise<string> {
     return unescape(this.getBlockBlobClient(location).url)
+  }
+
+  /**
+   * Write string|buffer contents to a destination. The missing
+   * intermediate directories will be created (if required).
+   */
+  public async put(location: string, contents: Buffer | string, options: BlockBlobUploadOptions | undefined): Promise<void> {
+    const blockBlobClient = this.getBlockBlobClient(location)
+    try {
+      return await blockBlobClient.upload(contents, contents.length, options) as unknown as void
+    } catch (error) {
+      throw CannotWriteFileException.invoke(location, error)
+    }
+  }
+
+  /**
+   * Write a stream to a destination. The missing intermediate
+   * directories will be created (if required).
+   */
+  public async putStream(location: string, contents: NodeJS.ReadableStream, options?: BlockBlobUploadStreamOptions): Promise<void> {
+    const blockBlobClient = this.getBlockBlobClient(location)
+
+    try {
+      const stream = new PassThrough()
+      stream.write(contents)
+      await blockBlobClient.uploadStream(stream, undefined, undefined, options)
+      
+    } catch (error) {
+      throw CannotWriteFileException.invoke(location, error)
+    }
   }
 }
