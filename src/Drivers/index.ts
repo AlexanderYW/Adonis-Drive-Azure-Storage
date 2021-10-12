@@ -39,15 +39,6 @@ import {
   BlockBlobUploadStreamOptions
 } from '@azure/storage-blob'
 
-/*
-  BlobServiceClient,
-  newPipeline,
-  StorageSharedKeyCredential,
-  generateBlobSASQueryParameters,
-  BlobSASPermissions,
-  BlobItem,
-*/
-
 const pipelinePromise = promisify(pipeline)
 
 export class AzureStorageDriver implements AzureStorageDriverContract {
@@ -312,5 +303,24 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
     } catch (error) {
       throw CannotGetMetaDataException.invoke(location, 'stats', error)
     }
+  }
+
+  /**
+   * Not Supported
+   * 
+   * Returns the file visibility
+   * 
+   */
+  public async getVisibility(location: string): Promise<Visibility> {
+    throw CannotGetMetaDataException.invoke(location, 'visibility', 'Not Supported')
+  }
+
+  /**
+   * Not supported
+   * 
+   * Sets the file visibility
+   */
+  public async setVisibility(location: string): Promise<void> {
+    throw CannotSetVisibilityException.invoke(location, 'Not Supported')
   }
 }
