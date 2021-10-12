@@ -295,4 +295,22 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
       throw CannotMoveFileException.invoke(source, destination, error.original || error)
     }
   }
+
+  /**
+   * Returns the file stats
+   */
+  public async getStats(location: string): Promise<DriveFileStats> {
+    try {
+      const metaData = await this.getBlockBlobClient(location).getProperties()
+
+      return {
+        modified: metaData.lastModified!,
+        size: metaData.contentLength!,
+        isFile: true,
+        etag: metaData.etag,
+      }
+    } catch (error) {
+      throw CannotGetMetaDataException.invoke(location, 'stats', error)
+    }
+  }
 }
