@@ -36,8 +36,7 @@ import {
   generateBlobSASQueryParameters,
   BlobSASSignatureValues,
   BlockBlobUploadOptions,
-  BlockBlobUploadStreamOptions,
-  BlobDeleteOptions,
+  BlockBlobUploadStreamOptions
 } from '@azure/storage-blob'
 
 /*
@@ -146,7 +145,7 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
   }
 
   public async generateBlobSASURL(blockBlobClient, options: BlobSASSignatureValues): Promise<string> {
-    options.permissions = BlobSASPermissions.parse(options.permissions as unknown as string || 'r')
+    options.permissions = options.permissions === null || typeof options.permissions === 'string' ? BlobSASPermissions.parse(options.permissions || 'r'): options.permissions
 
     options.startsOn = options.startsOn || new Date()
     options.expiresOn = options.expiresOn || new Date(options.startsOn.valueOf() + 3600 * 1000)
@@ -281,6 +280,19 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
       await this.getBlockBlobClient(location).delete()
     } catch (error) {
       throw CannotDeleteFileException.invoke(location, error)
+    }
+  }
+
+  /**
+   * Move a given location path from the source to the desination.
+   * The missing intermediate directories will be created (if required)
+   */
+  public async move(source: string, destination: string, options: BlobSASSignatureValues): Promise<void> {
+    try {
+      await this.copy(source, destination, options)
+      await this.delete(source)
+    } catch (error) {
+      throw CannotMoveFileException.invoke(source, destination, error.original || error)
     }
   }
 }
