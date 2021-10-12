@@ -147,8 +147,8 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
   public async generateBlobSASURL(blockBlobClient, options: BlobSASSignatureValues): Promise<string> {
     options.permissions = BlobSASPermissions.parse(options.permissions as unknown as string || 'r')
 
-    options.expiresOn = options.expiresOn || new Date(options.startsOn.valueOf() + 3600 * 1000)
     options.startsOn = options.startsOn || new Date()
+    options.expiresOn = options.expiresOn || new Date(options.startsOn.valueOf() + 3600 * 1000)
 
     const blobSAS = await generateBlobSASQueryParameters(
       {
@@ -222,11 +222,13 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
   /**
    * Write string|buffer contents to a destination. The missing
    * intermediate directories will be created (if required).
+   * 
+   * @todo look into returning the response of upload
    */
   public async put(location: string, contents: Buffer | string, options: BlockBlobUploadOptions | undefined): Promise<void> {
     const blockBlobClient = this.getBlockBlobClient(location)
     try {
-      return await blockBlobClient.upload(contents, contents.length, options) as unknown as void
+      await blockBlobClient.upload(contents, contents.length, options)
     } catch (error) {
       throw CannotWriteFileException.invoke(location, error)
     }
@@ -246,6 +248,25 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
       
     } catch (error) {
       throw CannotWriteFileException.invoke(location, error)
+    }
+  }
+
+  /**
+   * Copy a given location path from the source to the desination.
+   * The missing intermediate directories will be created (if required)
+   * 
+   * @todo look into returning the response of syncCopyFromURL
+   */
+  public async copy(source: string, destination: string, options: BlobSASSignatureValues): Promise<void> {
+    const sourceBlockBlobClient = this.getBlockBlobClient(source)
+    const destinationBlockBlobClient = this.getBlockBlobClient(destination)
+
+    const url = await this.generateBlobSASURL(sourceBlockBlobClient, options)
+
+    try {
+      await destinationBlockBlobClient.syncCopyFromURL(url)
+    } catch (error) {
+      throw CannotCopyFileException.invoke(source, destination, error.original || error)
     }
   }
 }
