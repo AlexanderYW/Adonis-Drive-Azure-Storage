@@ -37,6 +37,7 @@ import {
   BlobSASSignatureValues,
   BlockBlobUploadOptions,
   BlockBlobUploadStreamOptions,
+  BlobDeleteOptions,
 } from '@azure/storage-blob'
 
 /*
@@ -267,6 +268,19 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
       await destinationBlockBlobClient.syncCopyFromURL(url)
     } catch (error) {
       throw CannotCopyFileException.invoke(source, destination, error.original || error)
+    }
+  }
+
+  /**
+   * Remove a given location path
+   * 
+   * @todo find a way to extend delete with BlobDeleteOptions
+   */
+  public async delete(location: string): Promise<void> {
+    try {
+      await this.getBlockBlobClient(location).delete()
+    } catch (error) {
+      throw CannotDeleteFileException.invoke(location, error)
     }
   }
 }
