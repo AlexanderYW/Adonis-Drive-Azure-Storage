@@ -15,7 +15,6 @@ declare module '@ioc:Adonis/Core/Drive' {
    */
   export type AzureStorageDriverConfig = CommonOptions & {
     driver: 'AzureStorage'
-    visibility: Visibility
     connection_string?: string
     azure_tenant_id?: string
     azure_client_id?: string
