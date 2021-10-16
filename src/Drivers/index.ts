@@ -11,18 +11,17 @@ import {
 } from '@adonisjs/core/build/standalone'
 
 import {
+  CannotCreateContainerException,
+  CannotDeleteContainerException,
+  CannotFindContainerException,
+} from './utils'
+
+import {
   Visibility,
-  WriteOptions,
-  ContentHeaders,
   DriveFileStats,
-  DriverContract
   AzureStorageDriverConfig,
   AzureStorageDriverContract,
 } from '@ioc:Adonis/Core/Drive'
-
-import { promisify } from 'util'
-import { PassThrough, pipeline } from 'stream'
-import { string } from '@poppinss/utils/build/helpers'
 
 import { DefaultAzureCredential } from '@azure/identity'
 import {
@@ -36,10 +35,14 @@ import {
   generateBlobSASQueryParameters,
   BlobSASSignatureValues,
   BlockBlobUploadOptions,
-  BlockBlobUploadStreamOptions
+  BlockBlobUploadStreamOptions,
+  ContainerCreateOptions,
+  ContainerDeleteMethodOptions,
+  ContainerExistsOptions,
+  ContainerCreateResponse,
+  ContainerDeleteResponse,
 } from '@azure/storage-blob'
-
-const pipelinePromise = promisify(pipeline)
+import { ReadStream } from 'fs'
 
 export class AzureStorageDriver implements AzureStorageDriverContract {
   /**
@@ -53,21 +56,17 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
   public name: 'AzureStorage' = 'AzureStorage'
 
   constructor(private config: AzureStorageDriverConfig) {
-    if (typeof this.config.connection_string !== 'undefined') {
+    if (typeof config.connection_string !== 'undefined') {
       // eslint-disable-next-line
       this.adapter = BlobServiceClient.fromConnectionString(
-        this.config.connection_string
+        config.connection_string
       )
     } else {
       let credential
-      if (
-        this.config.azure_tenant_id &&
-        this.config.azure_client_id &&
-        this.config.azure_client_secret
-      ) {
+      if (config.azure_tenant_id && config.azure_client_id && config.azure_client_secret) {
         credential = new DefaultAzureCredential()
-      } else if (this.config.name && this.config.key) {
-        credential = new StorageSharedKeyCredential(this.config.name, this.config.key)
+      } else if (config.name && config.key) {
+        credential = new StorageSharedKeyCredential(config.name, config.key)
       }
 
       let url = `https://${this.config.name}.blob.core.windows.net`
@@ -80,63 +79,23 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
 
       this.adapter = new BlobServiceClient(url, azurePipeline)
     }
-
-    // this._container = new Resetable(this.config.container)
-  }
-
-  /**
-   * Transforms the write options to GCS properties. Checkout the
-   * following example in the docs to see the available options
-   *
-   * https://googleapis.dev/nodejs/storage/latest/File.html#createWriteStream
-   */
-  private transformWriteOptions(options?: WriteOptions) {
-    const {
-      visibility,
-      contentType,
-      contentDisposition,
-      contentEncoding,
-      contentLanguage,
-      ...adapterOptions
-    } = Object.assign({ visibility: this.config.visibility }, options)
-
-    adapterOptions.metadata = {}
-
-    if (contentType) {
-      adapterOptions['contentType'] = contentType
-    }
-
-    if (contentDisposition) {
-      adapterOptions.metadata['contentDisposition'] = contentDisposition
-    }
-
-    if (contentEncoding) {
-      adapterOptions.metadata['contentEncoding'] = contentEncoding
-    }
-
-    if (contentLanguage) {
-      adapterOptions.metadata['contentLanguage'] = contentLanguage
-    }
-
-    return adapterOptions
-  }
-
-  /**
-   * Converts ms expression to milliseconds
-   */
-  private msToTimeStamp(ms: string | number) {
-    return new Date(Date.now() + string.toMs(ms)).getTime()
   }
 
   public getBlockBlobClient(location: string) {
-    const container = this.config.container
+    const container = this.config.container as string
 
     const containerClient = this.adapter.getContainerClient(container)
     return containerClient.getBlockBlobClient(location)
   }
 
-  public async generateBlobSASURL(blockBlobClient, options: BlobSASSignatureValues): Promise<string> {
-    options.permissions = options.permissions === null || typeof options.permissions === 'string' ? BlobSASPermissions.parse(options.permissions || 'r'): options.permissions
+  public async generateBlobSASURL(
+    blockBlobClient,
+    options: BlobSASSignatureValues
+  ): Promise<string> {
+    options.permissions =
+      options.permissions === undefined || typeof options.permissions === 'string'
+        ? BlobSASPermissions.parse(options.permissions || 'r')
+        : options.permissions
 
     options.startsOn = options.startsOn || new Date()
     options.expiresOn = options.expiresOn || new Date(options.startsOn.valueOf() + 3600 * 1000)
@@ -155,12 +114,63 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
     return `${blockBlobClient.url}?${blobSAS.toString()}`
   }
 
+  public async existsContainer(
+    container: string,
+    options?: ContainerExistsOptions
+  ): Promise<boolean> {
+    const containerClient = this.adapter.getContainerClient(container)
+    try {
+      return await containerClient.exists(options)
+    } catch (error) {
+      throw CannotFindContainerException.invoke(container, error)
+    }
+  }
+
+  /**
+   * Creates a new container under the specified account. If the container with the same name already exists, the operation fails.
+   * @param container A container name
+   * @param options Options to Container Create operation.
+   * @returns
+   */
+  public async createContainer(
+    container: string,
+    options?: ContainerCreateOptions
+  ): Promise<ContainerCreateResponse> {
+    const containerClient = this.adapter.getContainerClient(container)
+    try {
+      return await containerClient.create(options)
+    } catch (error) {
+      throw CannotCreateContainerException.invoke(container, error)
+    }
+  }
+
+  /**
+   * Marks the specified container for deletion. The container and any blobs contained within it are later deleted during garbage collection.
+   * @param container A container name
+   * @param options Options to Container Delete operation.
+   * @returns
+   */
+  public async deleteContainer(
+    container: string,
+    options?: ContainerDeleteMethodOptions
+  ): Promise<ContainerDeleteResponse> {
+    const containerClient = this.adapter.getContainerClient(container)
+    try {
+      return await containerClient.delete(options)
+    } catch (error) {
+      throw CannotDeleteContainerException.invoke(container, error)
+    }
+  }
+
   /**
    * Returns the file contents as a buffer. The buffer return
    * value allows you to self choose the encoding when
    * converting the buffer to a string.
    */
-  public async get(location: string, options: BlobDownloadToBufferOptions | any = {}): Promise<Buffer> {
+  public async get(
+    location: string,
+    options: BlobDownloadToBufferOptions | any = {}
+  ): Promise<Buffer> {
     try {
       const blockBlobClient = this.getBlockBlobClient(location)
       return await blockBlobClient.downloadToBuffer(0, 0, options)
@@ -176,7 +186,8 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
     location: string,
     options: BlobDownloadOptions | any = {}
   ): Promise<NodeJS.ReadableStream> {
-    return (await this.getBlockBlobClient(location).download(0, 0, options)).readableStreamBody as NodeJS.ReadableStream
+    return (await this.getBlockBlobClient(location).download(0, 0, options))
+      .readableStreamBody as NodeJS.ReadableStream
   }
 
   /**
@@ -193,7 +204,12 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
   /**
    * Returns the signed url for a given path
    */
-  public async getSignedUrl(location: string, options: BlobSASSignatureValues): Promise<string> {
+  public async getSignedUrl(location: string, options?: BlobSASSignatureValues): Promise<string> {
+    options = options || {
+      containerName: this.config.container as string,
+    }
+    options.containerName = options.containerName || (this.config.container as string)
+
     try {
       const blockBlobClient = this.getBlockBlobClient(location)
       const SASUrl = await this.generateBlobSASURL(blockBlobClient, options)
@@ -213,10 +229,14 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
   /**
    * Write string|buffer contents to a destination. The missing
    * intermediate directories will be created (if required).
-   * 
+   *
    * @todo look into returning the response of upload
    */
-  public async put(location: string, contents: Buffer | string, options: BlockBlobUploadOptions | undefined): Promise<void> {
+  public async put(
+    location: string,
+    contents: Buffer | string,
+    options?: BlockBlobUploadOptions | undefined
+  ): Promise<void> {
     const blockBlobClient = this.getBlockBlobClient(location)
     try {
       await blockBlobClient.upload(contents, contents.length, options)
@@ -229,15 +249,17 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
    * Write a stream to a destination. The missing intermediate
    * directories will be created (if required).
    */
-  public async putStream(location: string, contents: NodeJS.ReadableStream, options?: BlockBlobUploadStreamOptions): Promise<void> {
+  public async putStream(
+    location: string,
+    contents: ReadStream,
+    options?: BlockBlobUploadStreamOptions
+  ): Promise<void> {
     const blockBlobClient = this.getBlockBlobClient(location)
 
     try {
-      const stream = new PassThrough()
-      stream.write(contents)
-      await blockBlobClient.uploadStream(stream, undefined, undefined, options)
-      
+      await blockBlobClient.uploadStream(contents, undefined, undefined, options)
     } catch (error) {
+      console.log(error)
       throw CannotWriteFileException.invoke(location, error)
     }
   }
@@ -245,10 +267,19 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
   /**
    * Copy a given location path from the source to the desination.
    * The missing intermediate directories will be created (if required)
-   * 
+   *
    * @todo look into returning the response of syncCopyFromURL
    */
-  public async copy(source: string, destination: string, options: BlobSASSignatureValues): Promise<void> {
+  public async copy(
+    source: string,
+    destination: string,
+    options?: BlobSASSignatureValues
+  ): Promise<void> {
+    options = options || {
+      containerName: this.config.container as string,
+    }
+    options.containerName = options.containerName || (this.config.container as string)
+
     const sourceBlockBlobClient = this.getBlockBlobClient(source)
     const destinationBlockBlobClient = this.getBlockBlobClient(destination)
 
@@ -263,7 +294,7 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
 
   /**
    * Remove a given location path
-   * 
+   *
    * @todo find a way to extend delete with BlobDeleteOptions
    */
   public async delete(location: string): Promise<void> {
@@ -278,7 +309,11 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
    * Move a given location path from the source to the desination.
    * The missing intermediate directories will be created (if required)
    */
-  public async move(source: string, destination: string, options: BlobSASSignatureValues): Promise<void> {
+  public async move(
+    source: string,
+    destination: string,
+    options?: BlobSASSignatureValues
+  ): Promise<void> {
     try {
       await this.copy(source, destination, options)
       await this.delete(source)
@@ -307,9 +342,9 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
 
   /**
    * Not Supported
-   * 
+   *
    * Returns the file visibility
-   * 
+   *
    */
   public async getVisibility(location: string): Promise<Visibility> {
     throw CannotGetMetaDataException.invoke(location, 'visibility', 'Not Supported')
@@ -317,7 +352,7 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
 
   /**
    * Not supported
-   * 
+   *
    * Sets the file visibility
    */
   public async setVisibility(location: string): Promise<void> {
