@@ -18,6 +18,38 @@ import { AzureStorageDriverConfig } from '@ioc:Adonis/Core/Drive'
 
 const fs = new Filesystem(join(__dirname, '__app'))
 
+test.group('Azure Storage driver | createContainer', () => {
+  test('create container', async (assert) => {
+    const config: AzureStorageDriverConfig = {
+      ...authenticationOptions,
+      container: AZURE_CONTAINER,
+      driver: 'AzureStorage' as const,
+    }
+    const driver = new AzureStorageDriver(config)
+    await driver.createContainer(AZURE_CONTAINER)
+
+    assert.isTrue(await driver.existsContainer(AZURE_CONTAINER))
+
+    await driver.deleteContainer(AZURE_CONTAINER)
+  }).timeout(0)
+})
+
+test.group('Azure Storage driver | deleteContainer', () => {
+  test('delete container', async (assert) => {
+    const config: AzureStorageDriverConfig = {
+      ...authenticationOptions,
+      container: AZURE_CONTAINER,
+      driver: 'AzureStorage' as const,
+    }
+    const driver = new AzureStorageDriver(config)
+    await driver.createContainer(AZURE_CONTAINER)
+
+    await driver.deleteContainer(AZURE_CONTAINER)
+
+    assert.isFalse(await driver.existsContainer(AZURE_CONTAINER))
+  }).timeout(0)
+})
+
 test.group('Azure Storage driver | put', (group) => {
   group.beforeEach(async () => {
     const config: AzureStorageDriverConfig = {

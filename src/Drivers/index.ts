@@ -38,33 +38,11 @@ import {
   ContainerDeleteResponse,
 } from '@azure/storage-blob'
 import { ReadStream } from 'fs'
-
-/**
- * Unable to write file to the destination
- */
-export declare class CannotCreateContainerException extends Exception {
-  private containerName: string // A container name
-  private original: any // Original error
-  public static invoke(containerName: string, original: any): CannotCreateContainerException
-}
-
-/**
- * Unable to get file metadata
- */
-export declare class CannotFindContainerException extends Exception {
-  private containerName: string // Container name
-  private original: any // Original error
-  public static invoke(containerName: string, original: any): CannotFindContainerException
-}
-
-/**
- * Unable to delete file from a given location
- */
-export declare class CannotDeleteContainerException extends Exception {
-  private containerName: string
-  private original: any
-  public static invoke(containerName: string, original: any): CannotDeleteContainerException
-}
+import {
+  CannotCreateContainerException,
+  CannotDeleteContainerException,
+  CannotFindContainerException,
+} from './utils'
 
 export class AzureStorageDriver implements AzureStorageDriverContract {
   /**
@@ -84,7 +62,7 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
         config.connection_string
       )
     } else {
-      let credential
+      let credential: any
       if (config.azure_tenant_id && config.azure_client_id && config.azure_client_secret) {
         credential = new DefaultAzureCredential()
       } else if (config.name && config.key) {
@@ -111,7 +89,7 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
   }
 
   public async generateBlobSASURL(
-    blockBlobClient,
+    blockBlobClient: { containerName: any; location: any; credential: any; url: any },
     options: BlobSASSignatureValues
   ): Promise<string> {
     options.permissions =
