@@ -24,4 +24,5 @@ jobs:
     - run: npm install -g azurite@3.14.2
     - run: azurite-blob --silent --loose --debug debug.log &
     - run: npm ci
+    - run: cp .env.example .env
     - run: npm test
