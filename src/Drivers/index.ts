@@ -8,7 +8,6 @@ import {
   CannotDeleteFileException,
   CannotGetMetaDataException,
   CannotSetVisibilityException,
-  Exception,
 } from '@adonisjs/core/build/standalone'
 
 import {
@@ -36,6 +35,7 @@ import {
   ContainerExistsOptions,
   ContainerCreateResponse,
   ContainerDeleteResponse,
+  BlockBlobClient,
 } from '@azure/storage-blob'
 import { ReadStream } from 'fs'
 import {
@@ -89,7 +89,7 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
   }
 
   public async generateBlobSASURL(
-    blockBlobClient: { containerName: any; location: any; credential: any; url: any },
+    blockBlobClient: BlockBlobClient,
     options: BlobSASSignatureValues
   ): Promise<string> {
     options.permissions =
@@ -100,15 +100,18 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
     options.startsOn = options.startsOn || new Date()
     options.expiresOn = options.expiresOn || new Date(options.startsOn.valueOf() + 3600 * 1000)
 
+    const factories = (blockBlobClient as any).pipeline.factories
+    const credential = factories[factories.length - 1] as StorageSharedKeyCredential
+
     const blobSAS = await generateBlobSASQueryParameters(
       {
         containerName: blockBlobClient.containerName, // Required
-        blobName: blockBlobClient.location, // Required
+        blobName: blockBlobClient.name, // Required
         permissions: options.permissions, // Required
         startsOn: options.startsOn,
         expiresOn: options.expiresOn,
       },
-      blockBlobClient.credential
+      credential
     )
 
     return `${blockBlobClient.url}?${blobSAS.toString()}`
