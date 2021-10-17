@@ -11,3 +11,4 @@ bin
 out
 .nyc_output
 .vscode
+.env
