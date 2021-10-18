@@ -15,7 +15,7 @@
 
 <div align="center">
 
-[![gh-workflow-image]][gh-workflow-url] [![CodeQL-image]][CodeQL-url] [![npm-image]][npm-url] ![][typescript-image] [![license-image]][license-url] [![synk-image]][synk-url]
+[![gh-workflow-image]][gh-workflow-url] [![CodeQL-image]][CodeQL-url] [![npm-download-image]][npm-download-url] [![npm-version-image]][npm-version-url] ![][typescript-image] [![license-image]][license-url] [![synk-image]][synk-url]
 
 </div>
 
@@ -49,8 +49,11 @@
 [typescript-image]: https://img.shields.io/badge/Typescript-294E80.svg?style=for-the-badge&logo=typescript
 [typescript-url]:  "typescript"
 
-[npm-image]: https://img.shields.io/npm/v/adonis-drive-azure-storage.svg?style=for-the-badge&logo=npm
-[npm-url]: https://npmjs.org/package/adonis-drive-azure-storage "npm"
+[npm-download-image]: https://img.shields.io/npm/dm/adonis-drive-azure-storage.svg?style=for-the-badge&logo=npm
+[npm-download-url]: https://npmjs.org/package/adonis-drive-azure-storage "npm"
+  
+[npm-version-image]: https://img.shields.io/npm/v/adonis-drive-azure-storage.svg?style=for-the-badge&logo=npm
+[npm-version-url]: https://npmjs.org/package/adonis-drive-azure-storage "npm"
 
 [license-image]: https://img.shields.io/npm/l/adonis-drive-azure-storage?color=blueviolet&style=for-the-badge
 [license-url]: LICENSE.md "license"
