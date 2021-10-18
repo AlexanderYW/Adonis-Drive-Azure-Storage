@@ -1,159 +1,62 @@
-# Adonis Drive - Azure Storage (blob)
+<div align="center">
+  <img src="https://res.cloudinary.com/adonisjs/image/upload/q_100/v1558612869/adonis-readme_zscycu.jpg" width="600px">
+</div>
 
-[![image](https://img.shields.io/npm/dm/adonis-drive-azure-storage.svg)](https://www.npmjs.com/package/adonis-drive-azure-storage)
-[![image](https://img.shields.io/npm/v/adonis-drive-azure-storage.svg)](https://www.npmjs.com/package/adonis-drive-azure-storage)
-[![image](https://img.shields.io/npm/l/adonis-drive-azure-storage.svg)](https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/blob/master/LICENSE)
-[![CodeQL](https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/workflows/CodeQL/badge.svg)](https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/actions?query=workflow%3ACodeQL)
-[![Node.js Package](https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/workflows/Node.js%20Package/badge.svg)](https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/actions?query=workflow%3A%22Node.js+Package%22)
+<br />
 
-## Requirements 📦
-Adonis Drive
-```sh
-adonis install @adonisjs/drive
-````
+<div align="center">
+  <h3>AdonisJS Drive x Azure Storage</h3>
+  <p>
+    Azure storage driver for AdonisJS drive.
+  </p>
+</div>
 
-Azure Storage driver
-```sh
-npm install adonis-drive-azure-storage --save
-```
+<br />
 
-## Setup ✏
-Register the provider inside `start/app.js` file along with `@adonisjs/drive` provider
-```javascript
-const providers = [
-    ...
-    '@adonisjs/drive/providers/DriveProvider',
-    'adonis-drive-azure-storage/providers/DriveProvider'
-]
-```
+<div align="center">
 
-Add the driver configuration inside `disks` module in `config/drive.js`
+[![gh-workflow-image]][gh-workflow-url] [![CodeQL-image]][CodeQL-url] [![npm-image]][npm-url] ![][typescript-image] [![license-image]][license-url] [![synk-image]][synk-url]
 
-```javascript
-/*
-|--------------------------------------------------------------------------
-| Azure
-|--------------------------------------------------------------------------
-|
-| Azure disk interacts with a container on Azure blob storage
-|
-*/
-azure: {
-  driver: 'azure', // Required
-  container: Env.get('AZURE_CONTAINER') // Required
+</div>
 
-  // There is 4 diffent way to connect to blob storage shown below
+<div align="center">
+  <h3>
+    <a href="https://adonisjs.com">
+      Website
+    </a>
+    <span> | </span>
+    <a href="https://docs.adonisjs.com/guides/drive">
+      Guides
+    </a>
+    <span> | </span>
+    <a href="instructions.md">
+      Azure Storage Guides
+    </a>
+    <span> | </span>
+    <a href="CONTRIBUTING.md">
+      Contributing
+    </a>
+  </h3>
+</div>
 
-  // 1. Either SAS or use `UseDevelopmentStorage=true` for local development
-  connection_string: Env.get('AZURE_CONNECTION_STRING'),
+<div align="center">
+  <sub>Built with ❤︎ by <a href="https://twitter.com/AlexanderYW">Alexander Wennerstrøm</a>
+</div>
 
-  // 2. Remote storage emulator
-  key: Env.get('AZURE_KEY'), // Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
-  name: Env.get('AZURE_SECRET'), // devstoreaccount1
-  // local_address below is used to find the remote emulator
-  local_address: Env.get('AZURE_LOCAL_ADDRESS'), // 'http://192.168.0.2:10000/devstoreaccount1'
+[gh-workflow-image]: https://img.shields.io/github/workflow/status/AlexanderYW/Adonis-Drive-Azure-Storage/Test%20package?label=Test&style=for-the-badge
+[gh-workflow-url]: https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/actions/workflows/test-package.yml "Test"
 
-  // 3. Azure blob storage
-  key: Env.get('AZURE_KEY'),
-  name: Env.get('AZURE_SECRET'),
+[typescript-image]: https://img.shields.io/badge/Typescript-294E80.svg?style=for-the-badge&logo=typescript
+[typescript-url]:  "typescript"
 
-  // 4. Azure AD (Not tested, might work, no promise)
-  azure_tenant_id: Env.get('AZURE_TENANT_ID'),
-  azure_client_id: Env.get('AZURE_CLIENT_ID'),
-  azure_client_secret: Env.get('AZURE_CLIENT_SECRET'),
-}
-```
+[npm-image]: https://img.shields.io/npm/v/adonis-drive-azure-storage.svg?style=for-the-badge&logo=npm
+[npm-url]: https://npmjs.org/package/adonis-drive-azure-storage "npm"
 
-Add variables inside the `.env` file
+[license-image]: https://img.shields.io/npm/l/adonis-drive-azure-storage?color=blueviolet&style=for-the-badge
+[license-url]: LICENSE.md "license"
 
-## Documentation 📝
+[synk-image]: https://img.shields.io/snyk/vulnerabilities/github/adonisjs/drive-gcs?label=Synk%20Vulnerabilities&style=for-the-badge
+[synk-url]: https://snyk.io/test/github/alexanderyw/adonis-drive-azure-storage?targetFile=package.json "synk"
 
-#### exists(relativePath)
-returns `boolean`
-```javascript
-const exists = await Drive.disk('azure').exists('unicorn.jpg')
-```
-
-#### get(relativePath)
-returns file as `buffer`
-```javascript
-const buffer = await Drive.disk('azure').get('unicorn.jpg')
-```
-
-#### getStream(relativePath)
-returns file as `Readable` stream
-```javascript
-const stream = await Drive.disk('azure').getStream('unicorn.jpg')
-```
-
-#### put(relativePath, Buffer)
-```javascript
-await Drive.disk('azure').put('unicorn.jpg', Buffer.from('Hello world!'))
-```
-
-#### putStream(relativePath, Readable)
-```javascript
-await Drive.disk('azure').putStream('unicorn.jpg', stream)
-```
-
-#### delete(relativePath)
-```javascript
-await Drive.disk('azure').delete('unicorn.jpg')
-```
-
-#### move(relativeSrcPath, relativeDestPath, options = {})
-```javascript
-await Drive.disk('azure').move('unicorn.jpg', 'unicorn-moved.jpg')
-```
-options
-```javascript
-{
-    destContainer: <String> // Default is same as current
-}
-```
-
-#### copy(relativeSrcPath, relativeDestPath, options = {})
-```javascript
-await Drive.disk('azure').copy('unicorn.jpg', 'unicorn-copy.jpg')
-```
-options
-```javascript
-{
-    destContainer: <String> // Default is same as current
-}
-```
-
-#### getUrl(relativePath)
-```javascript
-const url = await Drive.disk('azure').getUrl('unicorn.jpg')
-```
-
-#### getSignedUrl(relativePath, options = {})
-```javascript
-const url = await Drive.disk('azure').getSignedUrl('unicorn.jpg')
-```
-options
-```javascript
-{
-    permissions: "r", // (default)
-    expiry: 3600, // (default)
-    startsOn: new Date() // (default)
-}
-```
-permission access options
-```
-"r" = Read
-"a" = Add
-"c" = Create
-"w" = Write
-"d" = Delete
-```
-
-#### Change container
-```javascript
-const url = await Drive.disk('azure').container('second-container').exists('unicorn.jpg')
-```
-
-## Things to note 📒
-1. For now this package only supports blob storage
-2. The Azure AD credentials is not tested, but is implemeted the same way as the samples, if it worked please let me know
+[CodeQL-image]: https://img.shields.io/github/workflow/status/alexanderyw/Adonis-Drive-Azure-Storage/CodeQL?label=CodeQL&style=for-the-badge
+[CodeQL-url]: https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/actions?query=workflow%3ACodeQL "CodeQL"
