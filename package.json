@@ -67,7 +67,7 @@
     "japa": "^4.0.0",
     "mrm": "^3.0.8",
     "np": "^7.5.0",
-    "prettier": "^2.3.2",
+    "prettier": "^2.5.0",
     "typescript": "^4.4.2"
   },
   "peerDependencies": {
