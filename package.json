@@ -68,7 +68,7 @@
     "mrm": "^3.0.8",
     "np": "^7.5.0",
     "prettier": "^2.3.2",
-    "typescript": "^4.4.2"
+    "typescript": "^4.5.3"
   },
   "peerDependencies": {
     "@adonisjs/core": "^5.0.0"
