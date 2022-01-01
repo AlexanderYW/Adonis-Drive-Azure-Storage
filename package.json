@@ -85,7 +85,7 @@
   "dependencies": {
     "@azure/identity": "^2.0.1",
     "@azure/storage-blob": "^12.5.0",
-    "@poppinss/utils": "^3.2.0"
+    "@poppinss/utils": "^4.0.0"
   },
   "typings": "./build/adonis-typings/index.d.ts",
   "adonisjs": {
