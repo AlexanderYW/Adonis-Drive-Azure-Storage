@@ -58,7 +58,7 @@
     "del-cli": "^4.0.1",
     "dotenv": "^16.0.0",
     "eslint": "^8.13.0",
-    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-adonis": "^2.1.0",
     "eslint-plugin-prettier": "^4.0.0",
     "github-label-sync": "^2.0.2",
