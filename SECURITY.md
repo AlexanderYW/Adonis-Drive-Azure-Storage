@@ -7,7 +7,8 @@ See our Software Version Upgrade Policy for information on how I update and supp
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 4.1.x   | :white_check_mark: |
+| 4.1.x   |                    |
+| 5.0.x   | :white_check_mark: |
 
 ## Reporting a Vulnerability
 

@@ -1,7 +1,7 @@
 /*
- * @adonisjs/drive-gcs
+ * adonis-drive-azure-storage
  *
- * (c) Harminder Virk <virk@adonisjs.com>
+ * (c) Alexander Wennerstrøm <alexanderw0310@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
