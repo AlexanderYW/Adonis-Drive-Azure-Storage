@@ -21,7 +21,7 @@ services:
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
     network_mode: service:storage
   storage:
-    image: mcr.microsoft.com/azure-storage/azurite:3.14.2
+    image: mcr.microsoft.com/azure-storage/azurite:3.16.0
     restart: unless-stopped
     volumes:
       - azurite-data:/data/storage
