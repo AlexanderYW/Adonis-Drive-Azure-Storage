@@ -47,7 +47,7 @@
     "url": "https://github.com/AlexanderYW/Adonis-Drive-Azure-Storage/issues"
   },
   "devDependencies": {
-    "@adonisjs/core": "^5.4.2",
+    "@adonisjs/core": "^5.8.3",
     "@adonisjs/mrm-preset": "^5.0.3",
     "@adonisjs/require-ts": "^2.0.11",
     "@poppinss/dev-utils": "^2.0.3",
