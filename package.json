@@ -53,7 +53,6 @@
     "@poppinss/dev-utils": "^2.0.3",
     "@types/node": "^17.0.40",
     "copyfiles": "^2.4.1",
-    "cz-conventional-changelog": "^3.3.0",
     "del-cli": "^4.0.1",
     "dotenv": "^16.0.1",
     "eslint": "^8.17.0",
