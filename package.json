@@ -58,7 +58,7 @@
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-adonis": "^2.1.0",
-    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-prettier": "^4.1.0",
     "github-label-sync": "^2.2.0",
     "got": "^12.1.0",
     "husky": "^7.0.4",
