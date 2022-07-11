@@ -81,7 +81,7 @@
     "anyBranch": false
   },
   "dependencies": {
-    "@azure/identity": "^2.0.4",
+    "@azure/identity": "^2.1.0",
     "@azure/storage-blob": "^12.10.0",
     "@poppinss/utils": "^4.0.4"
   },
