@@ -61,7 +61,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "github-label-sync": "^2.2.0",
     "got": "^12.3.0",
-    "husky": "^7.0.4",
+    "husky": "^8.0.1",
     "japa": "^4.0.0",
     "mrm": "^4.0.0",
     "np": "^7.6.2",
