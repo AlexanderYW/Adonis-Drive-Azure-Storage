@@ -14,10 +14,8 @@
     "prepublishOnly": "npm run build",
     "lint": "eslint . --ext=.ts",
     "format": "prettier --write .",
-    "commit": "git-cz",
     "release": "np",
-    "version": "npm run build",
-    "sync-labels": "github-label-sync --labels ./node_modules/@adonisjs/mrm-preset/gh-labels.json adonisjs/drive-gcs"
+    "version": "npm run build"
   },
   "files": [
     "build/instructions.md",
@@ -59,9 +57,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-adonis": "^2.1.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "github-label-sync": "^2.2.0",
     "got": "^12.3.0",
-    "husky": "^7.0.4",
     "japa": "^4.0.0",
     "mrm": "^4.0.0",
     "np": "^7.6.2",
@@ -70,11 +66,6 @@
   },
   "peerDependencies": {
     "@adonisjs/core": "^5.0.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
   },
   "np": {
     "contents": ".",
