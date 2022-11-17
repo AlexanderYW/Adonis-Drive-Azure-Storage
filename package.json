@@ -57,7 +57,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-adonis": "^2.1.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "got": "^12.3.0",
+    "got": "^12.5.3",
     "japa": "^4.0.0",
     "mrm": "^4.0.0",
     "np": "^7.6.2",
