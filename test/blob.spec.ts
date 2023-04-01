@@ -50,6 +50,41 @@ test.group('Azure Storage driver | deleteContainer', () => {
   }).timeout(0)
 })
 
+test.group('Azure Storage driver | container', (group) => {
+  const newContainer = 'notdefault'
+  group.beforeEach(async () => {
+    const config: AzureStorageDriverConfig = {
+      ...authenticationOptions,
+      container: AZURE_CONTAINER,
+      driver: 'AzureStorage' as const,
+    }
+    const driver = new AzureStorageDriver(config).container(newContainer)
+    if (!(await driver.existsContainer(newContainer))) {
+      await driver.createContainer(newContainer)
+    }
+  })
+  group.afterEach(async () => {
+    const config: AzureStorageDriverConfig = {
+      ...authenticationOptions,
+      container: AZURE_CONTAINER,
+      driver: 'AzureStorage' as const,
+    }
+    const driver = new AzureStorageDriver(config).container(newContainer)
+    await driver.deleteContainer(newContainer)
+  })
+  test('returns container different from default', async (assert) => {
+    const config: AzureStorageDriverConfig = {
+      ...authenticationOptions,
+      container: AZURE_CONTAINER,
+      driver: 'AzureStorage' as const,
+    }
+    const driver = new AzureStorageDriver(config).container(newContainer)
+
+    assert.isTrue(await driver.existsContainer(newContainer))
+    assert.isTrue(newContainer === (await driver.getBlockBlobClient('/').containerName))
+  }).timeout(100)
+})
+
 test.group('Azure Storage driver | put', (group) => {
   group.beforeEach(async () => {
     const config: AzureStorageDriverConfig = {

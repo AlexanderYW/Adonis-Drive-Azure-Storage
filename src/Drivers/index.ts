@@ -36,6 +36,7 @@ import {
   ContainerCreateResponse,
   ContainerDeleteResponse,
   BlockBlobClient,
+  ContainerClient,
 } from '@azure/storage-blob'
 import { ReadStream } from 'fs'
 import {
@@ -55,6 +56,11 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
    */
   public name: 'AzureStorage' = 'AzureStorage'
 
+  /**
+   * Reference to the Azure container
+   */
+  public azureContainer: ContainerClient
+
   constructor(private config: AzureStorageDriverConfig) {
     if (typeof config.connection_string !== 'undefined') {
       // eslint-disable-next-line
@@ -62,7 +68,8 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
         config.connection_string
       )
     } else {
-      let credential: any
+      // eslint-disable-next-line no-undef-init
+      let credential: StorageSharedKeyCredential | DefaultAzureCredential = undefined
       if (config.azure_tenant_id && config.azure_client_id && config.azure_client_secret) {
         credential = new DefaultAzureCredential()
       } else if (config.name && config.key) {
@@ -78,7 +85,16 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
       const azurePipeline = newPipeline(credential)
 
       this.adapter = new BlobServiceClient(url, azurePipeline)
+      this.azureContainer = this.adapter.getContainerClient(this.config.container)
     }
+  }
+
+  /**
+   * Returns a new instance of the Azure Storage driver with
+   * a custom runtime container
+   */
+  public container(container: string): AzureStorageDriver {
+    return new AzureStorageDriver(Object.assign({}, this.config, { container }))
   }
 
   public getBlockBlobClient(location: string) {

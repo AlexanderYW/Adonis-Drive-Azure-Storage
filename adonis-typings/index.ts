@@ -31,5 +31,18 @@ declare module '@ioc:Adonis/Core/Drive' {
   export interface AzureStorageDriverContract extends DriverContract {
     name: 'AzureStorage'
     adapter: BlobServiceClient
+
+    /**
+     * Returns a new instance of the GCS driver with
+     * a custom runtime bucket
+     */
+    container(bucket: string): AzureStorageDriverContract
+  }
+
+  interface DriversList {
+    AzureStorage: {
+      implementation: AzureStorageDriverContract
+      config: AzureStorageDriverConfig
+    }
   }
 }
