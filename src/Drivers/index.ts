@@ -69,7 +69,7 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
       )
     } else {
       // eslint-disable-next-line no-undef-init
-      let credential: StorageSharedKeyCredential | DefaultAzureCredential = undefined
+      let credential: StorageSharedKeyCredential | DefaultAzureCredential | undefined = undefined
       if (config.azure_tenant_id && config.azure_client_id && config.azure_client_secret) {
         credential = new DefaultAzureCredential()
       } else if (config.name && config.key) {
@@ -85,7 +85,7 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
       const azurePipeline = newPipeline(credential)
 
       this.adapter = new BlobServiceClient(url, azurePipeline)
-      this.azureContainer = this.adapter.getContainerClient(this.config.container)
+      this.azureContainer = this.adapter.getContainerClient(this.config.container!)
     }
   }
 
@@ -98,7 +98,7 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
   }
 
   public getBlockBlobClient(location: string) {
-    const container = this.config.container as string
+    const container = this.config.container! as string
 
     const containerClient = this.adapter.getContainerClient(container)
     return containerClient.getBlockBlobClient(location)
@@ -225,9 +225,9 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
    */
   public async getSignedUrl(location: string, options?: BlobSASSignatureValues): Promise<string> {
     options = options || {
-      containerName: this.config.container as string,
+      containerName: this.config.container! as string,
     }
-    options.containerName = options.containerName || (this.config.container as string)
+    options.containerName = options.containerName || (this.config.container! as string)
 
     try {
       const blockBlobClient = this.getBlockBlobClient(location)
@@ -295,9 +295,9 @@ export class AzureStorageDriver implements AzureStorageDriverContract {
     options?: BlobSASSignatureValues
   ): Promise<void> {
     options = options || {
-      containerName: this.config.container as string,
+      containerName: this.config.container! as string,
     }
-    options.containerName = options.containerName || (this.config.container as string)
+    options.containerName = options.containerName || (this.config.container! as string)
 
     const sourceBlockBlobClient = this.getBlockBlobClient(source)
     const destinationBlockBlobClient = this.getBlockBlobClient(destination)
