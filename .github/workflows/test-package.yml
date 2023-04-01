@@ -21,7 +21,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install -g azurite@3.18.0
+    - run: npm install -g azurite@3.23.0
     - run: azurite-blob --silent --loose --debug debug.log &
     - run: npm ci
     - run: cp .env.example .env
