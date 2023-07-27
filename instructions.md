@@ -65,13 +65,13 @@ Open the `config/drive.ts` and paste the following code snippet inside it.
       connection_string: Env.get('AZURE_CONNECTION_STRING'),
 
       // 2. Remote storage emulator
-      name: Env.get('AZURE_KEY'),
-      key: Env.get('AZURE_SECRET'),
+      key: Env.get('AZURE_KEY'),
+      name: Env.get('AZURE_SECRET'),
       local_address: Env.get('AZURE_LOCAL_ADDRESS'),
 
       // 3. Azure blob storage
-      name: Env.get('AZURE_KEY'),
-      key: Env.get('AZURE_SECRET'),
+      key: Env.get('AZURE_KEY'),
+      name: Env.get('AZURE_SECRET'),
 
       // 4. Azure AD (Not tested, might work, no promise)
       azure_tenant_id: Env.get('AZURE_TENANT_ID'),
